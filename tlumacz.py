@@ -8,7 +8,6 @@ recognizer = sr.Recognizer()
 translator_pl_en = Translator(from_lang="pl", to_lang="en")
 translator_en_pl = Translator(from_lang="en", to_lang="pl")
 
-
 def speak(text):
     print(f"Tłumacz: {text}")
     engine.say(text)
