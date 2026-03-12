@@ -9,19 +9,15 @@ recognizer = sr.Recognizer()
 translator_pl_en = Translator(from_lang="pl", to_lang="en")
 translator_en_pl = Translator(from_lang="en", to_lang="pl")
 
-
 def speak(text):
     print(f"Tłumacz: {text}")
     engine.say(text)
     engine.runAndWait()
 
-
 def listen(language="pl-PL"):
     with sr.Microphone() as source:
-        # 1. ZŁOTY ŚRODEK: Czekamy pół sekundy, aż głośniki komputera na pewno zamilkną
         time.sleep(0.5)
 
-        # 2. Szybka kalibracja na szum tła
         recognizer.adjust_for_ambient_noise(source, duration=0.5)
 
         print(f"[Nasłuchuję w języku: {language}] ... (MÓW TERAZ)")
@@ -38,7 +34,6 @@ def listen(language="pl-PL"):
         except sr.WaitTimeoutError:
             return None
 
-
 def main():
     current_lang = None
 
@@ -52,10 +47,8 @@ def main():
         elif current_lang == "en":
             speak("Say something in English.")
 
-        # Wywołanie funkcji nasłuchującej
         text = listen(listen_lang)
 
-        # JEŚLI NIC NIE USŁYSZAŁ (albo usłyszał szum)
         if not text:
             if current_lang == "en":
                 speak("I don't understand. Say again please.")
@@ -63,7 +56,6 @@ def main():
                 speak("Nie rozumiem. Proszę powtórz.")
             continue
 
-        # KOMENDY ZAMYKAJĄCE
         if "bywaj" in text:
             speak("Do widzenia. Zamykam program.")
             break
@@ -72,7 +64,6 @@ def main():
             speak("Good bye, closing the program.")
             break
 
-        # KOMENDY ZMIANY JĘZYKA
         if "angielski" in text or "english" in text:
             current_lang = "en"
             speak("Zmieniono język na angielski.")
@@ -83,7 +74,6 @@ def main():
             speak("Changed language to Polish.")
             continue
 
-        # WŁAŚCIWE TŁUMACZENIE I CZYTANIE
         print("Trwa tłumaczenie...")
         if current_lang == "pl":
             translated_text = translator_pl_en.translate(text)
