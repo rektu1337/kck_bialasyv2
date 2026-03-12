@@ -55,17 +55,20 @@ def main():
 
         if not text:
             if current_lang == "en":
-                speak("I don't understand.")
+                speak("I don't understand. Say again please.")
             else:
-                speak("Nie rozumiem.")
+                speak("Nie rozumiem. Proszę powtórz.")
             continue
 
-        # 4. Sprawdzanie komend ZAKOŃCZENIA programu
-        if "bywaj" in text or "good bye" in text or "goodbye" in text:
+
+        if "bywaj" in text:
             speak("Do widzenia. Zamykam program.")
             break
 
-        # 5. Sprawdzanie komend ZMIANY JĘZYKA
+        if "goodbye" in text or "good bye" in text or "bye" in text:
+            speak("Good bye, closing the program.")
+
+
         if "angielski" in text or "english" in text:
             current_lang = "en"
             speak("Zmieniono język na angielski.")
@@ -76,7 +79,7 @@ def main():
             speak("Changed language to Polish.")
             continue
 
-        # 6. Właściwe tłumaczenie (jeśli nie wypowiedziano komendy sterującej)
+
         if current_lang == "pl":
             translated_text = translator_pl_en.translate(text)
             speak(translated_text)
@@ -84,7 +87,7 @@ def main():
             translated_text = translator_en_pl.translate(text)
             speak(translated_text)
         else:
-            # Sytuacja, gdy program dopiero wystartował i czeka na wybór
+
             speak("Proszę, najpierw wybierz język mówiąc 'polski' lub 'angielski'.")
 
 
