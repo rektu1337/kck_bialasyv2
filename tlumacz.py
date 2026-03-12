@@ -2,36 +2,33 @@ import speech_recognition as sr
 from translate import Translator
 import pyttsx3
 
-# Inicjalizacja narzędzi
 engine = pyttsx3.init()
 recognizer = sr.Recognizer()
 
-# Inicjalizacja dwóch kierunków tłumaczenia
 translator_pl_en = Translator(from_lang="pl", to_lang="en")
 translator_en_pl = Translator(from_lang="en", to_lang="pl")
 
 
 def speak(text):
-    """Funkcja pomocnicza, która wyświetla i wypowiada tekst."""
-    print(f"🤖 Aplikacja: {text}")
+    print(f"Tłumacz: {text}")
     engine.say(text)
     engine.runAndWait()
 
 
 def listen(language="pl-PL"):
-    """Funkcja pomocnicza nasłuchująca z mikrofonu."""
+
     with sr.Microphone() as source:
         recognizer.adjust_for_ambient_noise(source, duration=0.5)
-        print(f"🎤 [Nasłuchuję w języku: {language}] ...")
+        print(f"[Nasłuchuję w języku: {language}] ...")
         try:
             audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
             text = recognizer.recognize_google(audio, language=language)
-            print(f"👤 Ty: {text}")
+            print(f"Ty: {text}")
             return text.lower()
         except sr.UnknownValueError:
             return None
         except sr.RequestError:
-            print("⚠️ Błąd połączenia z serwerami Google.")
+            print("⚠Błąd połączenia.")
             return None
         except sr.WaitTimeoutError:
             return None
@@ -40,23 +37,23 @@ def listen(language="pl-PL"):
 def main():
     current_lang = None
 
-    # 1. Start aplikacji - prośba o wybór języka
+
     speak("Witaj. Powiedz 'polski' lub 'angielski', aby wybrać język.")
 
     while True:
-        # Ustawiamy język nasłuchiwania w zależności od wybranego trybu
+
         listen_lang = "en-US" if current_lang == "en" else "pl-PL"
 
-        # 2. Komunikaty zachęcające w odpowiednim języku
+
         if current_lang == "pl":
             speak("Powiedz coś po polsku.")
         elif current_lang == "en":
             speak("Say something in English.")
 
-        # Pobieranie głosu użytkownika
+
         text = listen(listen_lang)
 
-        # 3. Jeśli aplikacja nie zrozumiała (zwróciło None)
+
         if not text:
             if current_lang == "en":
                 speak("I don't understand.")
