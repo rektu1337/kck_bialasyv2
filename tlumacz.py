@@ -3,23 +3,23 @@ from translate import Translator
 import pyttsx3
 import time
 
-engine = pyttsx3.init()
 recognizer = sr.Recognizer()
 
 translator_pl_en = Translator(from_lang="pl", to_lang="en")
 translator_en_pl = Translator(from_lang="en", to_lang="pl")
 
+
 def speak(text):
     print(f"Tłumacz: {text}")
+    engine = pyttsx3.init()   # <-- świeża instancja za każdym razem
     engine.say(text)
     engine.runAndWait()
+    del engine                 # <-- zwolnij zasoby
+
 
 def listen(language="pl-PL"):
     with sr.Microphone() as source:
-        time.sleep(0.5)
-
-        recognizer.adjust_for_ambient_noise(source, duration=0.5)
-
+        time.sleep(0.2)
         print(f"[Nasłuchuję w języku: {language}] ... (MÓW TERAZ)")
         try:
             audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
@@ -34,9 +34,9 @@ def listen(language="pl-PL"):
         except sr.WaitTimeoutError:
             return None
 
+
 def main():
     current_lang = None
-
     speak("Witaj. Powiedz 'polski' lub 'angielski', aby wybrać język.")
 
     while True:
@@ -50,17 +50,14 @@ def main():
         text = listen(listen_lang)
 
         if not text:
-            if current_lang == "en":
-                speak("I don't understand. Say again please.")
-            else:
-                speak("Nie rozumiem. Proszę powtórz.")
+            speak("I don't understand. Say again." if current_lang == "en" else "Nie rozumiem. Proszę powtórz.")
             continue
 
         if "bywaj" in text:
             speak("Do widzenia. Zamykam program.")
             break
 
-        if "goodbye" in text or "good bye" in text or "bye" in text:
+        if any(w in text for w in ["goodbye", "good bye", "bye"]):
             speak("Good bye, closing the program.")
             break
 
@@ -74,24 +71,10 @@ def main():
             speak("Changed language to Polish.")
             continue
 
-        print("Trwa tłumaczenie...")
         if current_lang == "pl":
-            translated_text = translator_pl_en.translate(text)
-            print(f"DEBUG - Wynik z biblioteki translate: {translated_text}")
-
-            if translated_text:
-                speak(translated_text)
-            else:
-                print("Błąd: Serwer nie zwrócił tłumaczenia.")
-
+            speak(translator_pl_en.translate(text))
         elif current_lang == "en":
-            translated_text = translator_en_pl.translate(text)
-            print(f"DEBUG - Wynik z biblioteki translate: {translated_text}")
-
-            if translated_text:
-                speak(translated_text)
-            else:
-                print("Błąd: Serwer nie zwrócił tłumaczenia.")
+            speak(translator_en_pl.translate(text))
         else:
             speak("Proszę, najpierw wybierz język mówiąc 'polski' lub 'angielski'.")
 
