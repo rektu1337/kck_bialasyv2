@@ -8,14 +8,12 @@ recognizer = sr.Recognizer()
 translator_pl_en = Translator(from_lang="pl", to_lang="en")
 translator_en_pl = Translator(from_lang="en", to_lang="pl")
 
-
 def speak(text):
     print(f"Tłumacz: {text}")
-    engine = pyttsx3.init()   # <-- świeża instancja za każdym razem
+    engine = pyttsx3.init()   
     engine.say(text)
     engine.runAndWait()
-    del engine                 # <-- zwolnij zasoby
-
+    del engine                
 
 def listen(language="pl-PL"):
     with sr.Microphone() as source:
@@ -77,7 +75,3 @@ def main():
             speak(translator_en_pl.translate(text))
         else:
             speak("Proszę, najpierw wybierz język mówiąc 'polski' lub 'angielski'.")
-
-
-if __name__ == "__main__":
-    main()
