@@ -1,8 +1,7 @@
 import cv2
 from pose_module import PoseDetector
-from voice_module import VoiceController
+from voice import VoiceController
 from audio_module import AudioFeedback
-
 
 def main():
     cap = cv2.VideoCapture(0)
@@ -23,7 +22,6 @@ def main():
         # Mapowanie punktów charakterystycznych sylwetki (Landmarks)
         img = detector.find_pose(img)
         lm_list = detector.find_position(img, draw=False)
-
 
         cv2.imshow("Cyber Trener - Podglad OHP (v0.1)", img)
 
