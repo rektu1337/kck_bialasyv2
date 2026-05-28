@@ -28,6 +28,10 @@ class CyberTrainerApp:
         self.per = 0
         self.bar = 600
         
+        # Zmienne sesji do historii treningowej
+        self.session_reps = 0
+        self.session_perfect = 0
+        
         self.init_cameras()
         
     def init_cameras(self):
@@ -185,6 +189,12 @@ class CyberTrainerApp:
             self.dir = 0
             
             is_perfect = not self.current_rep_flawed
+            
+            # Zliczanie do historii aktualnej sesji
+            self.session_reps += 1
+            if is_perfect:
+                self.session_perfect += 1
+                
             self.profile_mgr.update_user(self.username, 1, 1 if is_perfect else 0)
             self.current_rep_flawed = False
             self.audio.play_notification("rep_done")
@@ -206,6 +216,8 @@ class CyberTrainerApp:
         cv2.putText(img_front, self.feedback_msg, (20, 135), cv2.FONT_HERSHEY_PLAIN, 2, self.color, 3)
 
     def cleanup(self):
+        """Sprzątanie na koniec działania programu i zapis logów sesji."""
+        self.profile_mgr.save_session(self.username, self.session_reps, self.session_perfect)
         self.cap_front.release()
         if self.has_side_cam:
             self.cap_side.release()

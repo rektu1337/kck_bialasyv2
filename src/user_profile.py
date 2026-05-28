@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 class UserProfileManager:
     def __init__(self, filepath="profiles.json"):
@@ -18,17 +19,37 @@ class UserProfileManager:
     def load_user(self, username):
         if username not in self.profiles:
             # Inicjalizacja nowego użytkownika
-            self.profiles[username] = {"total_reps": 0, "perfect_reps": 0}
+            self.profiles[username] = {
+                "total_reps": 0, 
+                "perfect_reps": 0,
+                "history": []
+            }
             self.save()
+        # Migracja starszych profili (kompatybilność wsteczna)
+        if "history" not in self.profiles[username]:
+            self.profiles[username]["history"] = []
+            self.save()
+            
         return self.profiles[username]
 
     def get_user(self, username):
-        return self.profiles.get(username, {"total_reps": 0, "perfect_reps": 0})
+        return self.profiles.get(username, {"total_reps": 0, "perfect_reps": 0, "history": []})
 
     def update_user(self, username, total_added, perfect_added):
         if username in self.profiles:
             self.profiles[username]["total_reps"] += total_added
             self.profiles[username]["perfect_reps"] += perfect_added
+            self.save()
+
+    def save_session(self, username, session_total, session_perfect):
+        """Zapisuje podsumowanie sesji treningowej po jej zakończeniu"""
+        if username in self.profiles and session_total > 0:
+            today = datetime.now().strftime("%Y-%m-%d %H:%M")
+            self.profiles[username]["history"].append({
+                "date": today,
+                "reps": session_total,
+                "perfect_reps": session_perfect
+            })
             self.save()
 
     def save(self):

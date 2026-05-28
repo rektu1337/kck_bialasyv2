@@ -6,9 +6,10 @@ Inteligentny asystent treningowy wykorzystujący wizję komputerową do monitoro
 
 System wykorzystuje biblioteki takie jak OpenCV oraz MediaPipe do precyzyjnego śledzenia punktów kluczowych ciała (landmarks) na obrazie z kamery. Program został ostatnio mocno rozbudowany o nowe mechanizmy:
 
-* **👀 Detekcja z Dwóch Kamer (Nowość):** Równoczesna analiza postawy z przodu i z boku (przy użyciu drugiej kamery). System weryfikuje m.in. czy wyciskanie w płaszczyźnie bocznej przebiega w linii pionowej.
-* **👤 Profile Użytkownika (Nowość):** Zapisywanie postępów dla różnych użytkowników. Aplikacja przechowuje sumę powtórzeń i analizuje historyczną **dokładność (accuracy)** Twoich ćwiczeń w oparciu o poprawność każdego powtórzenia.
-* **🔥 Rozgrzewka (Nowość):** Zanim zaczniesz ćwiczenie właściwe, system wymusza fazę 5-sekundowego rozciągania i wstępnego pobudzenia mięśni w pozycji wyprostowanych ramion.
+* **👀 Detekcja z Dwóch Kamer:** Równoczesna analiza postawy z przodu i z boku (przy użyciu drugiej kamery). System weryfikuje m.in. czy wyciskanie w płaszczyźnie bocznej przebiega w linii pionowej.
+* **👤 Profile Użytkownika:** Zapisywanie postępów dla różnych użytkowników. Aplikacja przechowuje sumę powtórzeń i analizuje historyczną **dokładność (accuracy)** Twoich ćwiczeń w oparciu o poprawność każdego powtórzenia.
+* **🌐 Web Dashboard (Nowość!):** Zintegrowana lokalna strona internetowa pozwalająca na przeglądanie wyników i interaktywnych wykresów pokazujących Twoje postępy na osi czasu.
+* **🔥 Rozgrzewka:** Zanim zaczniesz ćwiczenie właściwe, system wymusza fazę 5-sekundowego rozciągania i wstępnego pobudzenia mięśni w pozycji wyprostowanych ramion.
 * **📐 Zaawansowana Analiza Biomechaniki (Overhead Press):**
   * **Asymetria rąk:** Ostrzega, gdy ramiona nie są wyciskane równomiernie (`Wyrównaj ramiona!`).
   * **Pionowanie przedramion:** Monitoruje odchylenie przedramion od pionu, chroniąc stawy barkowe (`Pionuj przedramiona!`).
@@ -26,6 +27,7 @@ Zależności:
 * `opencv-python`
 * `mediapipe`
 * `numpy`
+* `flask`
 * *(pozostałe biblioteki wymienione w `requirements.txt` dla modułów audio i głosowych)*
 
 ## 🚀 Instalacja
@@ -52,7 +54,9 @@ Zależności:
 
 ## 🎯 Uruchamianie
 
-Aby rozpocząć korzystanie z Cyber Trenera, uruchom plik główny:
+### 1. Moduł Treningowy (Cyber Trener)
+
+Aby rozpocząć korzystanie z systemu kamer, uruchom plik główny:
 
 ```bash
 python src/main.py
@@ -61,21 +65,35 @@ python src/main.py
 * Na wstępie zostaniesz zapytany w terminalu o **Nazwę użytkownika**, aby załadować Twój profil z poprzednich sesji.
 * System automatycznie spróbuje uzyskać dostęp do Twojej domyślnej kamery (przód) oraz kamery o indeksie 1 (bok). 
 * Zostaniesz poprowadzony przez fazę rozgrzewki. Zastosuj się do instrukcji na ekranie.
-* Stanowisko powinno być dobrze oświetlone, a sylwetka od pasa w górę (w tym ramiona przy maksymalnym wyproście) w pełni widoczna w kadrze.
-* Aby zamknąć program, naciśnij klawisz `q` podczas aktywnego okna podglądu.
+* Aby zamknąć program i zapisać dane treningowe, naciśnij klawisz `q` podczas aktywnego okna podglądu.
+
+### 2. Panel Przeglądarkowy (Web Dashboard)
+
+Aby podejrzeć swoje statystyki na czytelnych wykresach, uruchom serwer lokalny:
+
+```bash
+python src/web/app.py
+```
+
+* Po uruchomieniu komendy otwórz w przeglądarce adres: `http://127.0.0.1:5000/`.
+* Na stronie możesz przełączać się między zapisanymi użytkownikami i weryfikować dokładność z poszczególnych dni.
 
 ## 📂 Struktura projektu
 
 ```text
 kck_bialasyv2/
 ├── src/
-│   ├── main.py            # Główna pętla i nowa klasa CyberTrainerApp
-│   ├── pose_module.py     # Klasa PoseDetector (wykrywanie sylwetki i liczenie kątów)
-│   ├── user_profile.py    # Moduł obsługujący bazę JSON profili użytkowników
-│   ├── audio_module.py    # Obsługa efektów dźwiękowych (powiadomienia)
-│   └── voice.py           # Obsługa komend głosowych / feedbacku audio
-├── profiles.json          # Baza danych zapisanych użytkowników
-├── requirements.txt       # Lista zależności projektu
+│   ├── main.py            # Główna pętla i interfejs wideo
+│   ├── pose_module.py     # Klasa PoseDetector (wykrywanie sylwetki)
+│   ├── user_profile.py    # Moduł obsługujący bazę JSON profili
+│   ├── audio_module.py    # Obsługa powiadomień dźwiękowych
+│   ├── voice.py           # Moduł analizy głosu
+│   └── web/               # Moduł strony internetowej
+│       ├── app.py             # Aplikacja i API we Flasku
+│       ├── templates/         # Pliki HTML (index.html)
+│       └── static/            # Zasoby CSS oraz skrypty JS
+├── profiles.json          # Baza danych statystyk treningowych
+├── requirements.txt       # Lista zależności projektu (w tym Flask)
 └── README.md              # Dokumentacja projektu
 ```
 
