@@ -27,6 +27,13 @@ class CyberTrainerApp:
         self.current_rep_flawed = False
         self.per = 0
         self.bar = 600
+        self.NUMBERS_PL = {
+            1: "jeden", 2: "dwa", 3: "trzy", 4: "cztery", 5: "pięć",
+            6: "sześć", 7: "siedem", 8: "osiem", 9: "dziewięć", 10: "dziesięć",
+            11: "jedenaście", 12: "dwanaście", 13: "trzynaście", 14: "czternaście",
+            15: "piętnaście", 16: "szesnaście", 17: "siedemnaście", 18: "osiemnaście",
+            19: "dziewiętnaście", 20: "dwadzieścia",
+        }
         
         # Zmienne sesji do historii treningowej
         self.session_reps = 0
@@ -198,6 +205,9 @@ class CyberTrainerApp:
             self.profile_mgr.update_user(self.username, 1, 1 if is_perfect else 0)
             self.current_rep_flawed = False
             self.audio.play_notification("rep_done")
+            rep_number = int(self.count)
+            spoken = self.NUMBERS_PL.get(rep_number, str(rep_number))
+            self.audio.say(spoken)
 
     def draw_ui(self, img_front):
         """Generowanie interfejsu wizualnego na obrazie."""
