@@ -286,6 +286,8 @@ def main():
     print("--- System Cyber Trener ---")
     username = input("Podaj nazwe uzytkownika: ").strip() or "Gosc"
     ip = input("Podaj IP kamery bocznej np. 192.168.1.100:8080 (Enter = pomiń): ").strip()
+    app = CyberTrainerApp(username, ip_webcam=ip)
+    ip = input("Podaj IP kamery bocznej np. 192.168.1.100:8080 (Enter = pomiń): ").strip()
 
     # Import i uruchomienie serwera web w osobnym wątku
     import threading

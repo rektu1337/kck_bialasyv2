@@ -9,7 +9,7 @@ System wykorzystuje biblioteki takie jak OpenCV oraz MediaPipe do precyzyjnego �
 * **👀 Detekcja z Dwóch Kamer:** Równoczesna analiza postawy z przodu i z boku (przy użyciu drugiej kamery). System weryfikuje m.in. czy wyciskanie w płaszczyźnie bocznej przebiega w linii pionowej.
 * **👤 Profile Użytkownika:** Zapisywanie postępów dla różnych użytkowników. Aplikacja przechowuje sumę powtórzeń i analizuje historyczną **dokładność (accuracy)** Twoich ćwiczeń w oparciu o poprawność każdego powtórzenia.
 * **🌐 Web Dashboard (Nowość!):** Zintegrowana lokalna strona internetowa pozwalająca na przeglądanie wyników i interaktywnych wykresów pokazujących Twoje postępy na osi czasu.
-* **🔥 Rozgrzewka:** Zanim zaczniesz ćwiczenie właściwe, system wymusza fazę 5-sekundowego rozciągania i wstępnego pobudzenia mięśni w pozycji wyprostowanych ramion.
+* **🔥 Rozgrzewka:** Zanim zaczniesz ćwiczenie właściwe, system wymusza fazę 3-sekundowego rozciągania i wstępnego pobudzenia mięśni w pozycji wyprostowanych ramion.
 * **📐 Zaawansowana Analiza Biomechaniki (Overhead Press):**
   * **Asymetria rąk:** Ostrzega, gdy ramiona nie są wyciskane równomiernie (`Wyrównaj ramiona!`).
   * **Pionowanie przedramion:** Monitoruje odchylenie przedramion od pionu, chroniąc stawy barkowe (`Pionuj przedramiona!`).
@@ -28,6 +28,7 @@ Zależności:
 * `mediapipe`
 * `numpy`
 * `flask`
+* `pyttsx3`
 * *(pozostałe biblioteki wymienione w `requirements.txt` dla modułów audio i głosowych)*
 
 ## 🚀 Instalacja
@@ -63,9 +64,10 @@ python src/main.py
 ```
 
 * Na wstępie zostaniesz zapytany w terminalu o **Nazwę użytkownika**, aby załadować Twój profil z poprzednich sesji.
-* System automatycznie spróbuje uzyskać dostęp do Twojej domyślnej kamery (przód) oraz kamery o indeksie 1 (bok). 
+* System automatycznie spróbuje uzyskać dostęp do Twojej domyślnej kamery (przód).
+* Następnie system zapyta Cię o adres IP kamery bocznej, należy wpisać sam adres + port. 
 * Zostaniesz poprowadzony przez fazę rozgrzewki. Zastosuj się do instrukcji na ekranie.
-* Aby zamknąć program i zapisać dane treningowe, naciśnij klawisz `q` podczas aktywnego okna podglądu.
+* Aby zamknąć program i zapisać dane treningowe, naciśnij klawisz `Q` podczas aktywnego okna podglądu.
 
 ### 2. Panel Przeglądarkowy (Web Dashboard)
 
