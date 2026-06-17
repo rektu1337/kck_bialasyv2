@@ -81,7 +81,6 @@ class CyberTrainerApp:
             self.has_side_cam = False
             print("Nie podano IP kamery bocznej. Analiza boczna wyłączona.")
 
-    
         self.detector_side = PoseDetector(complexity=2) if self.has_side_cam else None
 
     def run(self):
@@ -190,18 +189,18 @@ class CyberTrainerApp:
             self.feedback_front = "Dobra forma"
             self.color_front = (0, 255, 0)
 
-        # Weryfikacja boku - kąt tułowia przez nos->bark->biodro
-        
+        # Weryfikacja boku - przesunięcie poziome bark vs biodro
+        # bark powinien być mniej więcej nad biodrem przy prostych plecach
         side_error = False
         if self.has_side_cam and img_side is not None and len(lm_side) != 0:
             try:
-                
-                angle_torso = self.detector_side.find_angle(
-                    img_side, 8, 12, 24, draw=True
-                )
-                # Wyprostowana sylwetka: kąt ~170-180 stopni
-                # Garbienie/wygięcie do tyłu: kąt spada poniżej 155
-                if self.per > 30 and angle_torso < 155:
+                x_shoulder = lm_side[12][1]
+                x_hip = lm_side[24][1]
+
+                # Prawa strona do kamery: bark za bardzo z tyłu = wygięcie
+                # offset ujemny = bark za biodrem (wygięcie do tyłu)
+                offset = x_hip - x_shoulder
+                if self.per > 30 and offset < 0:
                     side_error = True
                     self.feedback_side = "Nie wyginaj plecow!"
                     self.color_side = (0, 0, 255)
@@ -245,13 +244,21 @@ class CyberTrainerApp:
 
     def draw_ui(self, img_front):
         """Generowanie interfejsu wizualnego na obrazie."""
-        # Pasek postępu
+        # Półprzezroczysty panel informacyjny
+        overlay = img_front.copy()
+        cv2.rectangle(overlay, (0, 0), (900, 200), (255, 255, 255), cv2.FILLED)
+        cv2.addWeighted(overlay, 0.4, img_front, 0.6, 0, img_front)
+
+        # Półprzezroczysty pasek postępu
+        overlay2 = img_front.copy()
+        cv2.rectangle(overlay2, (1100, int(self.bar)), (1175, 600), self.color_front, cv2.FILLED)
+        cv2.addWeighted(overlay2, 0.4, img_front, 0.6, 0, img_front)
+
+        # Obramowanie paska postępu (pełne)
         cv2.rectangle(img_front, (1100, 100), (1175, 600), self.color_front, 3)
-        cv2.rectangle(img_front, (1100, int(self.bar)), (1175, 600), self.color_front, cv2.FILLED)
         cv2.putText(img_front, f'{int(self.per)} %', (1100, 75), cv2.FONT_HERSHEY_PLAIN, 4, self.color_front, 4)
 
-        # Panel informacyjny
-        cv2.rectangle(img_front, (0, 0), (900, 200), (255, 255, 255), cv2.FILLED)
+        # Teksty na panelu
         cv2.putText(img_front, f'Powt(sesja): {int(self.count)}', (20, 45), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
         user_data = self.profile_mgr.get_user(self.username)
@@ -262,10 +269,8 @@ class CyberTrainerApp:
                     (0, 100, 0), 2)
 
         if self.state == "WARMUP":
-            # Podczas rozgrzewki jeden komunikat
             cv2.putText(img_front, self.feedback_warmup, (20, 130), cv2.FONT_HERSHEY_PLAIN, 2, self.color_warmup, 3)
         else:
-            # Podczas ćwiczenia dwa osobne komunikaty
             cv2.putText(img_front, f'Przod: {self.feedback_front}', (20, 130), cv2.FONT_HERSHEY_PLAIN, 2,
                         self.color_front, 2)
             if self.has_side_cam and self.feedback_side:
@@ -286,14 +291,12 @@ def main():
     print("--- System Cyber Trener ---")
     username = input("Podaj nazwe uzytkownika: ").strip() or "Gosc"
     ip = input("Podaj IP kamery bocznej np. 192.168.1.100:8080 (Enter = pomiń): ").strip()
-    app = CyberTrainerApp(username, ip_webcam=ip)
-    ip = input("Podaj IP kamery bocznej np. 192.168.1.100:8080 (Enter = pomiń): ").strip()
 
     # Import i uruchomienie serwera web w osobnym wątku
     import threading
     from web.app import app as flask_app
     flask_thread = threading.Thread(
-        target=lambda: flask_app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False), 
+        target=lambda: flask_app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False),
         daemon=True
     )
     flask_thread.start()
@@ -303,7 +306,6 @@ def main():
     print(f"Zalogowano jako: {username}. Suma powtorzen: {app.user_data['total_reps']}")
     print("System uruchomiony. Naciśnij 'q', aby wyjść.")
     app.run()
-
 
 
 if __name__ == "__main__":
