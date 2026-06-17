@@ -189,16 +189,14 @@ class CyberTrainerApp:
             self.feedback_front = "Dobra forma"
             self.color_front = (0, 255, 0)
 
-        # Weryfikacja boku - przesunięcie poziome bark vs biodro
-        # bark powinien być mniej więcej nad biodrem przy prostych plecach
+
+
         side_error = False
         if self.has_side_cam and img_side is not None and len(lm_side) != 0:
             try:
                 x_shoulder = lm_side[12][1]
                 x_hip = lm_side[24][1]
 
-                # Prawa strona do kamery: bark za bardzo z tyłu = wygięcie
-                # offset ujemny = bark za biodrem (wygięcie do tyłu)
                 offset = x_hip - x_shoulder
                 if self.per > 30 and offset < 0:
                     side_error = True
@@ -244,21 +242,17 @@ class CyberTrainerApp:
 
     def draw_ui(self, img_front):
         """Generowanie interfejsu wizualnego na obrazie."""
-        # Półprzezroczysty panel informacyjny
         overlay = img_front.copy()
         cv2.rectangle(overlay, (0, 0), (900, 200), (255, 255, 255), cv2.FILLED)
         cv2.addWeighted(overlay, 0.4, img_front, 0.6, 0, img_front)
 
-        # Półprzezroczysty pasek postępu
         overlay2 = img_front.copy()
         cv2.rectangle(overlay2, (1100, int(self.bar)), (1175, 600), self.color_front, cv2.FILLED)
         cv2.addWeighted(overlay2, 0.4, img_front, 0.6, 0, img_front)
 
-        # Obramowanie paska postępu (pełne)
         cv2.rectangle(img_front, (1100, 100), (1175, 600), self.color_front, 3)
         cv2.putText(img_front, f'{int(self.per)} %', (1100, 75), cv2.FONT_HERSHEY_PLAIN, 4, self.color_front, 4)
 
-        # Teksty na panelu
         cv2.putText(img_front, f'Powt(sesja): {int(self.count)}', (20, 45), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
         user_data = self.profile_mgr.get_user(self.username)
@@ -278,7 +272,7 @@ class CyberTrainerApp:
                             self.color_side, 2)
 
     def cleanup(self):
-        """Sprzątanie na koniec działania programu i zapis logów sesji."""
+        """zapis logów sesji."""
         self.profile_mgr.save_session(self.username, self.session_reps, self.session_perfect)
         self.audio.stop()
         self.cap_front.release()
