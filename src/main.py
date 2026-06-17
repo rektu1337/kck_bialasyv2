@@ -287,9 +287,23 @@ def main():
     username = input("Podaj nazwe uzytkownika: ").strip() or "Gosc"
     ip = input("Podaj IP kamery bocznej np. 192.168.1.100:8080 (Enter = pomiń): ").strip()
     app = CyberTrainerApp(username, ip_webcam=ip)
+    ip = input("Podaj IP kamery bocznej np. 192.168.1.100:8080 (Enter = pomiń): ").strip()
+
+    # Import i uruchomienie serwera web w osobnym wątku
+    import threading
+    from web.app import app as flask_app
+    flask_thread = threading.Thread(
+        target=lambda: flask_app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False), 
+        daemon=True
+    )
+    flask_thread.start()
+    print("Serwer web (Flask) został uruchomiony na http://127.0.0.1:5000 w tle.")
+
+    app = CyberTrainerApp(username, ip_webcam=ip)
     print(f"Zalogowano jako: {username}. Suma powtorzen: {app.user_data['total_reps']}")
     print("System uruchomiony. Naciśnij 'q', aby wyjść.")
     app.run()
+
 
 
 if __name__ == "__main__":

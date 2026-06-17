@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Ścieżka do pliku profiles.json zlokalizowanego w głównym katalogu projektu
-PROFILES_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "profiles.json")
+PROFILES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "profiles.json")
 
 @app.route('/')
 def index():
